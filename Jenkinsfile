@@ -2,29 +2,71 @@ pipeline {
     agent any
 
     tools {
-        maven 'maven3'   // must match the name in Tools config
-        jdk 'jdk25'      // must match the JDK name
+        maven 'maven3'
+        jdk 'jdk25'
     }
 
     stages {
-        stage('Verify Tools') {
-            steps {
-                sh 'mvn -version'
-                sh 'java -version'
-            }
-        }
-
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/devops-garage/mvn-build-demo.git', credentialsId: 'devops-garage'
+                checkout scm
             }
         }
 
-        stage('Build') {
+        stage('Validate') {
             steps {
-                sh 'mvn clean compile'
+                sh 'mvn validate'
             }
         }
 
+        stage('Compile') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage('Package') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+
+        stage('Clean') {
+            steps {
+                sh 'mvn clean'
+            }
+        }
+
+        stage('Clean Package') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Install') {
+            steps {
+                sh 'mvn install'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'All Maven stages passed'
+        }
+        failure {
+            echo 'Build failed, check the console output'
+        }
     }
 }
