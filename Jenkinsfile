@@ -3,7 +3,7 @@ pipeline {
 
     tools {
         maven 'maven3'   // must match the name in Tools config
-        jdk 'jdk17'      // must match the JDK name
+        jdk 'jdk25'      // must match the JDK name
     }
 
     stages {
