@@ -1,6 +1,5 @@
 pipeline {
-    agent any
-
+    agent { label 'jenkins-agent-slave' }
     tools {
         maven 'maven3'
         jdk 'jdk25'
